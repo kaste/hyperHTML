@@ -845,6 +845,9 @@ var $ = (function (globalDocument, majinbuu) {'use strict';
   // [template] = {fragment, paths};
   var templates = new $Map;
 
+  // [hashes] = {value};
+  var hashes = new $Map;
+
   // internal signal to switch adoption
   var notAdopting = true;
 
@@ -1182,15 +1185,36 @@ var $ = (function (globalDocument, majinbuu) {'use strict';
     var wire = wires.get(obj);
     var i = type.indexOf(':');
     var id = type;
-    if (-1 < i) {
-      id = type.slice(i + 1);
-      type = type.slice(0, i) || 'html';
-    }
     if (!wire) {
       wire = {};
       wires.set(obj, wire);
     }
+    if (-1 < i) {
+      id = type.slice(i + 1);
+      type = type.slice(0, i) || 'html';
+    } else if (!(id in wire)) {
+      wire[id] = lazyWire.bind({self: obj, type: type});
+    }
     return wire[id] || (wire[id] = wireContent(type));
+  }
+
+  function lazyWire(statics) {
+    statics = TL(statics);
+    var uid = hashes.get(statics);
+    if (!uid) {
+      uid = '_' + hash(statics.join(UIDC)) + '$';
+      hashes.set(statics, uid);
+    }
+    return wireWeakly(this.self, this.type + ':' + uid).apply(null, arguments);
+  }
+
+  function hash(str) {
+    var hval = 0x811c9dc5, i = 0, length = str.length;
+    while (i < length) {
+      hval ^= str.charCodeAt(i++);
+      hval += (hval << 1) + (hval << 4) + (hval << 7) + (hval << 8) + (hval << 24);
+    }
+    return hval >>> 0;
   }
 
   // avoid processing too many nodes

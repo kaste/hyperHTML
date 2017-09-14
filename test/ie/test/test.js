@@ -60,7 +60,8 @@ var _templateObject = _taggedTemplateLiteral(['\n    <p data-counter="', '">\n  
     _templateObject54 = _taggedTemplateLiteral(['\n      <rect x=', ' y=', ' />'], ['\n      <rect x=', ' y=', ' />']),
     _templateObject55 = _taggedTemplateLiteral(['\n      <p attr=', ' onclick=', '>hello</p>'], ['\n      <p attr=', ' onclick=', '>hello</p>']),
     _templateObject56 = _taggedTemplateLiteral(['\n        <p data-call="test" onclick=', '>hello</p>'], ['\n        <p data-call="test" onclick=', '>hello</p>']),
-    _templateObject57 = _taggedTemplateLiteral(['<div>\n    <dumb-element dumb=', '></dumb-element><dumber-element dumb=', '></dumber-element>\n  </div>'], ['<div>\n    <dumb-element dumb=', '></dumb-element><dumber-element dumb=', '></dumber-element>\n  </div>']);
+    _templateObject57 = _taggedTemplateLiteral(['<div>\n    <dumb-element dumb=', '></dumb-element><dumber-element dumb=', '></dumber-element>\n  </div>'], ['<div>\n    <dumb-element dumb=', '></dumb-element><dumber-element dumb=', '></dumber-element>\n  </div>']),
+    _templateObject58 = _taggedTemplateLiteral(['<p>hi</p>'], ['<p>hi</p>']);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -913,6 +914,12 @@ tressa.async(function (done) {
   tressa.assert(o.a === 'a' && o.b === 'b', 'state was updated');
   s.state = { z: 123 };
   tressa.assert(s.state.z === 123 && !s.state.a, 'state can be re-set too');
+}).then(function () {
+  tressa.log('## wire(obj)');
+  var obj = {};
+  var wire = hyperHTML.wire(obj);
+  tressa.assert(wire === hyperHTML.wire(obj), 'same wire');
+  tressa.assert(wire(_templateObject58) === wire(_templateObject58), 'same result');
 })
 // */
 .then(function () {

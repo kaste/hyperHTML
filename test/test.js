@@ -883,6 +883,13 @@ tressa.async(function (done) {
   s.state = {z: 123};
   tressa.assert(s.state.z === 123 && !s.state.a, 'state can be re-set too');
 })
+.then(function () {
+  tressa.log('## wire(obj)');
+  var obj = {};
+  var wire = hyperHTML.wire(obj);
+  tressa.assert(wire === hyperHTML.wire(obj), 'same wire');
+  tressa.assert(wire`<p>hi</p>` === wire`<p>hi</p>`, 'same result');
+})
 // */
 .then(function () {
   if (!tressa.exitCode) {
