@@ -8,12 +8,27 @@ export const appendNodes = 'append' in fragment ?
     node.append.apply(node, childNodes);
   } :
   (node, childNodes) => {
-    const fragment = node.ownerDocument.createDocumentFragment();
     for (let i = 0, length = childNodes.length; i < length; i++) {
-      fragment.appendChild(childNodes[i]);
+      node.appendChild(childNodes[i]);
     }
-    node.appendChild(fragment);
   };
+
+export const createText = (node, text) => node.ownerDocument.createTextNode(text);
+
+appendNodes(fragment, [createText(fragment, 'g'), createText(fragment, '')]);
+export const cloneNode = fragment.cloneNode(true).childNodes.length === 1 ?
+  node => {
+    const clone = node.cloneNode();
+    for (let
+      childNodes = node.childNodes || [],
+      i = 0, length = childNodes.length;
+      i < length; i++
+    ) {
+      clone.appendChild(cloneNode(childNodes[i]));
+    }
+    return clone;
+  } :
+  node => node.cloneNode(true);
 
 export const getChildren = WK || IE ?
   node => {

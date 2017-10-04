@@ -34,8 +34,14 @@ export const wire = (obj, type) =>
 
 export const bind = context => render.bind(context);
 
+export function Component() {};
+
+hyper.MAX_LIST_SIZE = 1000;
+hyper.Component = Component;
+hyper.document = document;
 export default hyper;
 
+export const hyperHTML = hyper;
 
 const wireContent = type => type;
 
@@ -75,3 +81,72 @@ function update() {
 function upgrade() {
   
 }
+
+
+
+///////////////////////////////////////////////////////////////////////////
+// hyper.Component
+///////////////////////////////////////////////////////////////////////////
+
+const lazyGetter = (type, fn) => {
+  const secret = '_' + type + '$';
+  return {
+    configurable: true,
+    get() {
+      return this[secret] || (this[type] = fn.call(this, type));
+    },
+    set(value) {
+      Object.defineProperty(this, secret, {
+        configurable: true,
+        value
+      });
+    }
+  };
+};
+
+Object.defineProperties(
+  Component.prototype,
+  {
+    // same as HyperHTMLElement handleEvent
+    handleEvent: {
+      configurable: true,
+      value(e) {
+        const ct = e.currentTarget;
+        this[
+          // the Component, which is a no-op,
+          // is used as no-op if no getAttribute is available
+          (ct.getAttribute || Component).call(ct, 'data-call') ||
+          ('on' + e.type)
+        ](e);
+      }
+    },
+    // returns its own HTML wire or create it once on comp.render()
+    html: lazyGetter('html', wireContent),
+    // returns its own SVG wire or create it once on comp.render()
+    svg: lazyGetter('svg', wireContent),
+    // same as HyperHTMLElement state
+    state: lazyGetter('state', function () {
+      return this.defaultState;
+    }),
+    // same as HyperHTMLElement get defaultState
+    defaultState: {
+      configurable: true,
+      get() {
+        return {};
+      }
+    },
+    // same as HyperHTMLElement setState
+    setState: {
+      configurable: true,
+      value(state) {
+        const target = this.state;
+        const source = typeof state === 'function' ? state.call(this, target) : state;
+        for (let key in source) target[key] = source[key];
+        this.render();
+      }
+    }
+    // the render must be defined when extending hyper.Component
+    // the render **must** return either comp.html or comp.svg wire
+    // render() { return this.html`<p>that's it</p>`; }
+  }
+);
