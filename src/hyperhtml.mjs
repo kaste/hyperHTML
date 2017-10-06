@@ -39,6 +39,8 @@ export function Component() {};
 hyper.MAX_LIST_SIZE = 1000;
 hyper.Component = Component;
 hyper.document = document;
+hyper.bind = bind;
+hyper.wire = wire;
 export default hyper;
 
 export const hyperHTML = hyper;
@@ -81,8 +83,6 @@ function update() {
 function upgrade() {
   
 }
-
-
 
 ///////////////////////////////////////////////////////////////////////////
 // hyper.Component

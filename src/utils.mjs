@@ -1,6 +1,10 @@
 import {UIDC} from './constants.js';
 import {FF, IE, WK} from './detected.js';
 
+///////////////////////////////////////////////////////////////////////////
+// DOM utilities
+///////////////////////////////////////////////////////////////////////////
+
 const fragment = document.createDocumentFragment();
 
 export const appendNodes = 'append' in fragment ?
@@ -47,7 +51,7 @@ export const getChildren = WK || IE ?
   } :
   node => node.children;
 
-export const getNode = IE || WK ?
+export const getNode = WK || IE ?
   (parentNode, path) => {
     for (let i = 0, length = path.length; i < length; i++) {
       const name = path[i++];
@@ -69,17 +73,21 @@ export const getNode = IE || WK ?
     return parentNode;
   };
 
-export const isArray = Array.isArray || ((toString) => {
-  const str = toString.call([]);
-  return array => toString.call(array) === str;
-})({}.toString);
+///////////////////////////////////////////////////////////////////////////
+// Template Literals utilities
+///////////////////////////////////////////////////////////////////////////
 
-export const trim = ''.trim || function trim() {
-  return this.replace(/^\s+|\s+$/g, '');
+const hash = str => {
+  let value = 0x811c9dc5, i = 0, length = str.length;
+  while (i < length) {
+    value ^= str.charCodeAt(i++);
+    value += (value << 1) + (value << 4) + (value << 7) + (value << 8) + (value << 24);
+  }
+  return value >>> 0;
 };
 
 export let TL = template => {
-  if (template.propertyIsEnumerable('raw') || FF) {
+  if (FF || template.propertyIsEnumerable('raw')) {
     const templateObjects = {};
     TL = template => {
       const key = '_' + template.join(UIDC);

@@ -2,6 +2,10 @@ import {UID} from './constants.js';
 
 const window = document.defaultView;
 
+///////////////////////////////////////////////////////////////////////////
+// DOM poorlyfills
+///////////////////////////////////////////////////////////////////////////
+
 let $Event = window.Event;
 
 try {
@@ -9,12 +13,19 @@ try {
 } catch(o_O) {
   $Event = function Event(type) {
     const e = document.createEvent('Event');
-    e.initEvent(type, false, false);
-    return e;
+    return e.initEvent(type, false, false), e;
   };
 }
 
 export const Event = $Event;
+
+///////////////////////////////////////////////////////////////////////////
+// ES5+ poorlyfills
+///////////////////////////////////////////////////////////////////////////
+// for a better, yet poor, Map, Set, WeakMap, and WeakSet
+// implementation, check poorlyfills package:
+// https://github.com/WebReflection/poorlyfills
+///////////////////////////////////////////////////////////////////////////
 
 export const Map = window.Map || function Map() {
   const k = [], v = [];
@@ -44,4 +55,13 @@ export const WeakSet = window.WeakSet || function WeakSet() {
     add(obj) { wm.set(obj, UID); },
     has(obj) { return wm.get(obj) === UID; }
   };
+};
+
+export const isArray = Array.isArray || ((toString) => {
+  const str = toString.call([]);
+  return array => toString.call(array) === str;
+})({}.toString);
+
+export const trim = ''.trim || function trim() {
+  return this.replace(/^\s+|\s+$/g, '');
 };
