@@ -414,6 +414,8 @@ var hyperHTML = (function (globalDocument, majinbuu) {'use strict';
             );
           } else if (isPromise_ish(value)) {
             value.then(anyContent);
+          } else if ('subscribe' in value) {
+            value.subscribe(anyContent)
           } else if ('placeholder' in value) {
             invokeAtDistance(anyContent, value);
           } else if ('text' in value) {
